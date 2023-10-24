@@ -1,0 +1,28 @@
+my-costum-button {
+    background-color: #653040;
+    border-color: #653040;
+}
+
+my-costum-button:hover {
+    background-color: #C3675D;
+    border-color: #C3675D;
+}
+
+body {
+    background-color: #E2D7BF;
+}
+
+h1 {
+    color: #653040;
+    border-color: #653040;
+}
+
+.card-title {
+    color: #653040;
+    border-color: #653040;
+}
+
+.btn {
+    background-color: #653040;
+    border-color: #653040;
+}
