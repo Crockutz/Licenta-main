@@ -6,10 +6,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './DashboardPage.css';
 import { Link } from 'react-router-dom';
 
+let provider = null;
+let signer = null;
+
+export function getProvider() {
+  return provider;
+}
+
+export function getSigner() {
+  return signer;
+}
+
 
 function DashboardPage() {
-
-  
 
   // Properties
   const [walletAddress, setWalletAddress] = useState(null);
@@ -21,6 +30,7 @@ function DashboardPage() {
   const [usdtHoldings, setUsdtHoldings] = useState(null);
   const [walletHistory, setWalletHistory] = useState(null);
   const [accountRequested, setAccountRequested] = useState(false);
+  
 
 
   const abi = [
@@ -37,6 +47,7 @@ function DashboardPage() {
   }, []);
 
   // Cerere pret Gas
+  
   useEffect(() => {
     fetch("http://localhost:4000/api/gasprice")
     .then(response => response.json())
@@ -88,7 +99,8 @@ function DashboardPage() {
 
     if(window.ethereum) {
       try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        provider = new ethers.BrowserProvider(window.ethereum);
+        signer = await provider.getSigner();
         console.log('Connected to MetaMask');
         console.log(provider);
 
@@ -149,10 +161,18 @@ function DashboardPage() {
     }
   }
 
+  function sendEth() {
+    // const [value, setValue] = useState(null);
+    // const [toWallet, setToWallet] = useState(null);
+
+    // const sendEthereumButton() {
+      
+    // }
+  }
+
 
   return (
     <div className='App'>
-      <header>
       <h1 className="grid text-center mt-3">My Dashboard</h1>
         <div className="grid text-center mt-5">
           <button type="button" className="my-custom-button m-3" onClick={requestAccount}>Request Wallet</button>
@@ -204,9 +224,12 @@ function DashboardPage() {
         </div>
 
         <Link to="/sendethereum" className='btn btn-secondary btn-lg'>Send Ethereum</Link>
-      </header>
+        <Link to="/swapassets" className='btn btn-secondary btn-lg'>Swap Your Assets</Link>
+
     </div>
   )
 }
+
+
 
 export default DashboardPage
