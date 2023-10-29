@@ -9,12 +9,13 @@ header {
   align-items: center;
   padding-left: 50px;
   padding-right: 50px;
+  background-color: #653040;
 }
 
 .logo{
   width: 100px;
   height: 100px;
-  margin-top: 50px;
+  margin-top: 10px;
 }
 
 .eth{
