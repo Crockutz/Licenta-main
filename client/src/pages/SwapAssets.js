@@ -10,9 +10,24 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import tokenList from '../tokenList.json'
+import axios from 'axios';
+import { createConfig, configureChains, mainnet } from '@wagmi/core'
+import { publicProvider } from '@wagmi/core/providers/public'
+import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask'
+
+
 
 function SwapAssets() {
 
+
+  const { publicClient } = configureChains([mainnet], [publicProvider()])
+
+  const config = createConfig({
+    autoConnect: true,
+    publicClient,
+  })
+
+  
   const [slippage, setSlippage] = useState(2.5);
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
@@ -20,6 +35,7 @@ function SwapAssets() {
   const [tokenTwo, setTokenTwo] = useState(tokenList[1]);
   const [isOpen, setIsOpen] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
+  const [prices, setPrices] = useState(null); 
 
   function handleSlippageChange(e) {
     setSlippage(e.target.value);
@@ -27,13 +43,24 @@ function SwapAssets() {
 
   function changeAmount(e) {
     setTokenOneAmount(e.target.value);
+    if(e.target.value && prices) {
+      setTokenTwoAmount((e.target.value * prices.ratio).toFixed(2));
+      console.log(prices.ratio)
+    } else {
+      setTokenTwo(null);
+    }
   }
 
   function switchTokens() {
+    setPrices(null);
+    setTokenOneAmount(null);
+    setTokenTwoAmount(null);
+
     const one = tokenOne;
     const two = tokenTwo;
     setTokenOne(two);
     setTokenTwo(one);
+    fetchPrices(two.address, one.address);
   }
 
   function openModal(asset) {
@@ -42,13 +69,33 @@ function SwapAssets() {
   }
 
   function modifyToken(i) {
+    setPrices(null);
+    setTokenOneAmount(null);
+    setTokenTwoAmount(null);
+
     if(changeToken === 1) {
       setTokenOne(tokenList[i]);
+      fetchPrices(tokenList[i].address, tokenTwo.address); 
     } else {
       setTokenTwo(tokenList[i]);
+      fetchPrices(tokenOne.address, tokenList[i].address);
     }
     setIsOpen(false);
   }
+
+  async function fetchPrices(one, two) {
+    const response = await axios.get(`http://localhost:3001/tokenPrice`, {
+      params: {addressOne: one, addressTwo: two}
+    });
+
+    console.log(response.data);
+
+    setPrices(response.data);
+  }
+
+  useEffect(() => {
+    fetchPrices(tokenList[0].address, tokenList[1].address);
+  }, [])
 
 
   const settings= (
@@ -106,7 +153,7 @@ function SwapAssets() {
           </Popover>
         </div>
         <div className='inputs'>
-          <Input placeholder='0' value={tokenOneAmount} onChange={changeAmount} />
+          <Input placeholder='0' value={tokenOneAmount} onChange={changeAmount} disabled={!prices}/>
           <Input placeholder='0' value={tokenTwoAmount} disabled={true} />
           <div className='switchButton' onClick={switchTokens}>
             <ArrowDownOutlined className='switchArrow' />
@@ -117,8 +164,8 @@ function SwapAssets() {
             <DownOutlined />
           </div>
           <div className='assetTwo' onClick={() => openModal(2)}>
-            <img src={tokenTwo.img} alt="assetTwoLogo" className='assetLogo' />
-            {tokenTwo.ticker}
+            <img src={tokenTwo && tokenTwo.img} alt="assetTwoLogo" className='assetLogo' />
+            {tokenTwo && tokenTwo.ticker}
             <DownOutlined />
           </div>
         </div>

@@ -26,7 +26,7 @@ app.get("/tokenPrice", async (req, res) => {
     ratio: responseOne.raw.usdPrice/responseTwo.raw.usdPrice
   }
 
-  return res.status(200).json({usdPrices});
+  return res.status(200).json(usdPrices);
 });
 
 Moralis.start({
